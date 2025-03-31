@@ -20,18 +20,21 @@ func Scan(ctx context.Context, config configuration.Configuration, path string, 
 		return fmt.Errorf("failed to run govulncheck: %w", err)
 	}
 	if err := c.Wait(); err != nil {
-		return fmt.Errorf("failed while running govulncheck: %w", err)
+		return fmt.Errorf("failed while running golang/govulncheck: %w", err)
 	}
 	// check the vulnerabilities in the JSON output and ignore those that are excluded
 	d := json.NewDecoder(out)
 	r := &OpenVexReport{}
 	if err := d.Decode(r); err != nil {
-		return fmt.Errorf("failed to decode JSON document: %w", err)
+		return fmt.Errorf("failed to decode the vulnerability report: %w", err)
 	}
 	// remove ignored vulnerabilities
 	r.PruneIgnoreVulns(config.IgnoredVulnerabilities)
 	if len(r.Statements) > 0 {
-		jr, _ := json.MarshalIndent(r, "", "  ")
+		jr, err := json.MarshalIndent(r, "", "  ")
+		if err != nil {
+			return fmt.Errorf("failed to encode the vulnerability report: %w", err)
+		}
 		fmt.Fprintln(stderr, string(jr))
 		return fmt.Errorf("%d vulnerabilities found", len(r.Statements))
 	}
