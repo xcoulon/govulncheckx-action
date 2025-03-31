@@ -11,8 +11,8 @@ type Statement struct {
 	Vulnerability   Vulnerability `json:"vulnerability"`
 	Products        []Product     `json:"products,omitempty"`
 	Status          string        `json:"status"`
-	Justfication    string        `json:"justification"`
-	ImpactStatement string        `json:"impact_statement"`
+	Justfication    string        `json:"justification,omitempty"`
+	ImpactStatement string        `json:"impact_statement,omitempty"`
 }
 
 type Vulnerability struct {
