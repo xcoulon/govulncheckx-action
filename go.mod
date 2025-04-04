@@ -1,4 +1,4 @@
-module github.com/xcoulon/golvulncheck-action
+module github.com/xcoulon/govulncheckx-action
 
 go 1.22.12
 
