@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/xcoulon/golvulncheck-action/internal/govulncheck"
+	"github.com/xcoulon/govulncheckx-action/internal/govulncheck"
 )
 
 func TestPruneIgnoreVulns(t *testing.T) {
