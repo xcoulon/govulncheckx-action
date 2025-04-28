@@ -1,5 +1,12 @@
 package govulncheck
 
+import (
+	"log"
+	"time"
+
+	"github.com/xcoulon/govulncheckx-action/internal/configuration"
+)
+
 type OpenVexReport struct {
 	Statements []Statement `json:"statements,omitempty"`
 }
@@ -31,14 +38,19 @@ type Subcomponent struct {
 	ID string `json:"@id"`
 }
 
-func (r *OpenVexReport) PruneIgnoreVulns(ignored []string) {
+func (r *OpenVexReport) PruneIgnoreVulns(logger *log.Logger, ignored []configuration.Vulnerability) {
 	statements := make([]Statement, 0, len(r.Statements))
 statements:
 	for _, s := range r.Statements {
 		if s.Status == Affected {
 			// remove if ignored
-			for _, i := range ignored {
-				if s.Vulnerability.Name == i {
+			for _, vuln := range ignored {
+				if s.Vulnerability.Name == vuln.ID {
+					if vuln.Expires.Before(time.Now()) {
+						// if expired, do not ignore it anymore
+						logger.Printf("vulnerability '%s' not ignored: expired, please reevaluate", vuln.ID)
+						statements = append(statements, s)
+					}
 					continue statements
 				}
 			}

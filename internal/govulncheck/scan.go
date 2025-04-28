@@ -40,6 +40,6 @@ func Scan(ctx context.Context, logger *log.Logger, config configuration.Configur
 		return nil, fmt.Errorf("failed to decode the vulnerability report: %w", err)
 	}
 	// remove ignored vulnerabilities
-	r.PruneIgnoreVulns(config.IgnoredVulnerabilities)
+	r.PruneIgnoreVulns(logger, config.IgnoredVulnerabilities)
 	return r, nil
 }

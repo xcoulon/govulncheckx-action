@@ -27,7 +27,7 @@ func NewVulnCheckCmd() *cobra.Command {
 		Short:        "Run govulncheck and exclude vulnerabilities listed in the '--ignored' YAML file",
 		SilenceUsage: true,
 		Args:         cobra.ExactArgs(0),
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(cmd *cobra.Command, _ []string) error {
 			config, err := configuration.New(configFile)
 			if err != nil {
 				return err
