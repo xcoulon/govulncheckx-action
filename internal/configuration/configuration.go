@@ -2,12 +2,19 @@ package configuration
 
 import (
 	"os"
+	"time"
 
 	"gopkg.in/yaml.v3"
 )
 
 type Configuration struct {
-	IgnoredVulnerabilities []string `yaml:"ignored-vulnerabilities"`
+	IgnoredVulnerabilities []Vulnerability `yaml:"ignored-vulnerabilities"`
+}
+
+type Vulnerability struct {
+	ID      string    `yaml:"id"`
+	Expires time.Time `yaml:"expires"`
+	Info    string    `yaml:"info"`
 }
 
 func New(path string) (Configuration, error) {
