@@ -58,7 +58,7 @@ func TestPruneIgnoreVulns(t *testing.T) {
 		assert.Equal(t, "GO-2025-0003", r.Statements[1].Vulnerability.Name)
 	})
 
-	t.Run("ignore first and last vulns", func(t *testing.T) {
+	t.Run("ignore first and third vulns", func(t *testing.T) {
 		// given
 		r := newOpenVexReport()
 		ignoredVulns := []configuration.Vulnerability{
@@ -122,6 +122,12 @@ func newOpenVexReport() *govulncheck.OpenVexReport {
 				Name: "GO-2025-0003",
 			},
 			Status: govulncheck.Affected,
+		},
+		{
+			Vulnerability: govulncheck.Vulnerability{
+				Name: "GO-2025-0004",
+			},
+			Status: govulncheck.NotAffected,
 		},
 	}
 	return r
