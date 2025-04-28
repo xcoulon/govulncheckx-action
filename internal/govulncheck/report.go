@@ -48,7 +48,7 @@ statements:
 				if s.Vulnerability.Name == vuln.ID {
 					if vuln.Expires.Before(time.Now()) {
 						// if expired, do not ignore it anymore
-						logger.Printf("vulnerability '%s' not ignored: expired, please reevaluated", vuln.ID)
+						logger.Printf("vulnerability '%s' not ignored: expired, please reevaluate", vuln.ID)
 						statements = append(statements, s)
 					}
 					continue statements
