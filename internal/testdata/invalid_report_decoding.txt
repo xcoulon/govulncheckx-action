@@ -1,0 +1,160 @@
+{
+  "config": {
+    "protocol_version": "v1.0.0",
+    "scanner_name": "govulncheck",
+    "scanner_version": "v1.1.4",
+    "db": "https://vuln.go.dev",
+    "db_last_modified": "2025-04-24T18:14:57Z",
+    "go_version": "go1.22.12",
+    "scan_level": "symbol",
+    "scan_mode": "source"
+  }
+}
+{
+  "osv": {
+    "schema_version": "1.3.1",
+    "id": "GO-2024-2611",
+    "summary": "Infinite loop in JSON unmarshaling in google.golang.org/protobuf",
+    "database_specific": {
+      "url": "https://pkg.go.dev/vuln/GO-2024-2611",
+      "review_status": "REVIEWED"
+    }
+  }
+{
+  "osv": {
+    "schema_version": "1.3.1",
+    "id": "GO-2025-3563",
+    "modified": "2025-04-08T19:46:23Z",
+    "published": "2025-04-08T19:46:23Z",
+    "aliases": [
+      "CVE-2025-22871"
+    ],
+    "summary": "Request smuggling due to acceptance of invalid chunked data in net/http",
+	    "database_specific": {
+          "url": "https://pkg.go.dev/vuln/GO-2025-3563",
+          "review_status": "REVIEWED"
+      }
+   }
+}
+{
+  "finding": {
+    "osv": "GO-2025-3563",
+    "fixed_version": "v1.23.8",
+    "trace": [
+      {
+        "module": "stdlib",
+        "version": "v1.22.12"
+      }
+    ]
+  }
+}
+{
+  "finding": {
+    "osv": "GO-2025-3563",
+    "fixed_version": "v1.23.8",
+    "trace": [
+      {
+        "module": "stdlib",
+        "version": "v1.22.12",
+        "package": "net/http/internal"
+      }
+    ]
+  }
+}
+{
+  "finding": {
+    "osv": "GO-2025-3563",
+    "fixed_version": "v1.23.8",
+    "trace": [
+      {
+        "module": "stdlib",
+        "version": "v1.22.12",
+        "package": "net/http/internal",
+        "function": "Read",
+        "receiver": "*chunkedReader",
+        "position": {
+          "filename": "src/net/http/internal/chunked.go",
+          "offset": 2853,
+          "line": 97,
+          "column": 26
+        }
+      },
+      {
+        "module": "stdlib",
+        "version": "v1.22.12",
+        "package": "net/http",
+        "function": "readLocked",
+        "receiver": "*body",
+        "position": {
+          "filename": "src/net/http/transfer.go",
+          "offset": 23996,
+          "line": 840,
+          "column": 21
+        }
+      },
+      {
+        "module": "stdlib",
+        "version": "v1.22.12",
+        "package": "net/http",
+        "function": "Read",
+        "receiver": "*body",
+        "position": {
+          "filename": "src/net/http/transfer.go",
+          "offset": 23856,
+          "line": 832,
+          "column": 21
+        }
+      },
+      {
+        "module": "stdlib",
+        "version": "v1.22.12",
+        "package": "bytes",
+        "function": "ReadFrom",
+        "receiver": "*Buffer",
+        "position": {
+          "filename": "src/bytes/buffer.go",
+          "offset": 7467,
+          "line": 211,
+          "column": 17
+        }
+      },
+      {
+        "module": "github.com/spf13/viper",
+        "version": "v1.7.0",
+        "package": "github.com/spf13/viper",
+        "function": "unmarshalReader",
+        "receiver": "*Viper",
+        "position": {
+          "filename": "viper.go",
+          "offset": 45078,
+          "line": 1486,
+          "column": 14
+        }
+      },
+      {
+        "module": "github.com/spf13/viper",
+        "version": "v1.7.0",
+        "package": "github.com/spf13/viper",
+        "function": "ReadInConfig",
+        "receiver": "*Viper",
+        "position": {
+          "filename": "viper.go",
+          "offset": 40971,
+          "line": 1347,
+          "column": 25
+        }
+      },
+      {
+        "module": "package",
+        "package": "package/pkg/configuration",
+        "function": "Load",
+        "position": {
+          "filename": "pkg/configuration/config.go",
+          "offset": 3504,
+          "line": 95,
+          "column": 26
+        }
+      }
+    ]
+  }
+}

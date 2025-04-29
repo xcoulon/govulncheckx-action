@@ -8,7 +8,7 @@ import (
 )
 
 type Configuration struct {
-	IgnoredVulnerabilities []Vulnerability `yaml:"ignored-vulnerabilities"`
+	IgnoredVulnerabilities []*Vulnerability `yaml:"ignored-vulnerabilities"`
 }
 
 type Vulnerability struct {
