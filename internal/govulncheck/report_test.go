@@ -1,134 +1,166 @@
-package govulncheck_test
+package govulncheck
 
 import (
-	"log"
+	"os"
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/xcoulon/govulncheckx-action/internal/configuration"
-	"github.com/xcoulon/govulncheckx-action/internal/govulncheck"
 )
 
-func TestPruneIgnoreVulns(t *testing.T) {
-	logger := log.Default()
-
-	t.Run("ignore all vulns", func(t *testing.T) {
-		// given
-		r := newOpenVexReport()
-		ignoredVulns := []configuration.Vulnerability{
-			{
-				ID:      "GO-2025-0001",
-				Expires: time.Date(2200, 5, 10, 0, 0, 0, 0, time.UTC),
-				Info:    "https://pkg.go.dev/vuln/GO-2025-0001",
+func TestParseReport(t *testing.T) {
+	t.Run("valid report", func(t *testing.T) {
+		expectedOSVs := map[string]*OSV{
+			"GO-2024-2611": {
+				ID:      "GO-2024-2611",
+				Summary: "Infinite loop in JSON unmarshaling in google.golang.org/protobuf",
+				DatabaseSpecific: DatabaseSpecific{
+					URL: "https://pkg.go.dev/vuln/GO-2024-2611",
+				},
 			},
-			{
-				ID:      "GO-2025-0002",
-				Expires: time.Date(2200, 5, 10, 0, 0, 0, 0, time.UTC),
-				Info:    "https://pkg.go.dev/vuln/GO-2025-0002",
+			"GO-2025-3563": {
+				ID:      "GO-2025-3563",
+				Summary: "Request smuggling due to acceptance of invalid chunked data in net/http",
+				DatabaseSpecific: DatabaseSpecific{
+					URL: "https://pkg.go.dev/vuln/GO-2025-3563",
+				},
 			},
-			{
-				ID:      "GO-2025-0003",
-				Expires: time.Date(2200, 5, 10, 0, 0, 0, 0, time.UTC),
-				Info:    "https://pkg.go.dev/vuln/GO-2025-0003",
-			},
-		}
-		// when
-		r.PruneIgnoreVulns(logger, ignoredVulns)
-		// then
-		assert.Empty(t, r.Statements)
-	})
-
-	t.Run("ignore first vuln", func(t *testing.T) {
-		// given
-		r := newOpenVexReport()
-		ignoredVulns := []configuration.Vulnerability{
-			{
-				ID:      "GO-2025-0001",
-				Expires: time.Date(2200, 5, 10, 0, 0, 0, 0, time.UTC),
-				Info:    "https://pkg.go.dev/vuln/GO-2025-0001",
+			"GO-2025-3547": {
+				ID:      "GO-2025-3547",
+				Summary: "Kubernetes kube-apiserver Vulnerable to Race Condition in k8s.io/kubernetes",
+				DatabaseSpecific: DatabaseSpecific{
+					URL: "https://pkg.go.dev/vuln/GO-2025-3547",
+				},
 			},
 		}
-		// when
-		r.PruneIgnoreVulns(logger, ignoredVulns)
-		// then
-		require.Len(t, r.Statements, 2)
-		assert.Equal(t, "GO-2025-0002", r.Statements[0].Vulnerability.Name)
-		assert.Equal(t, "GO-2025-0003", r.Statements[1].Vulnerability.Name)
-	})
 
-	t.Run("ignore first and third vulns", func(t *testing.T) {
-		// given
-		r := newOpenVexReport()
-		ignoredVulns := []configuration.Vulnerability{
-			{
-				ID:      "GO-2025-0001",
-				Expires: time.Date(2200, 5, 10, 0, 0, 0, 0, time.UTC),
-				Info:    "https://pkg.go.dev/vuln/GO-2025-0001",
+		expectedFindings := map[string][]*Finding{
+			"GO-2025-3563": {
+				{
+					Osv:          "GO-2025-3563",
+					FixedVersion: "v1.23.8",
+					Trace: []Trace{
+						{
+							Module:   "stdlib",
+							Version:  "v1.22.12",
+							Package:  "net/http/internal",
+							Function: "Read",
+							Position: Position{
+								Filename: "src/net/http/internal/chunked.go",
+								Line:     97,
+								Column:   26,
+							},
+						},
+						{
+							Module:   "stdlib",
+							Version:  "v1.22.12",
+							Package:  "net/http",
+							Function: "readLocked",
+							Position: Position{
+								Filename: "src/net/http/transfer.go",
+								Line:     840,
+								Column:   21,
+							},
+						},
+						{
+							Module:   "package",
+							Package:  "package/pkg/configuration",
+							Function: "Load",
+							Position: Position{
+								Filename: "pkg/configuration/config.go",
+								Line:     95,
+								Column:   26,
+							},
+						},
+					},
+				},
 			},
-
-			{
-				ID:      "GO-2025-0003",
-				Expires: time.Date(2200, 5, 10, 0, 0, 0, 0, time.UTC),
-				Info:    "https://pkg.go.dev/vuln/GO-2025-0003",
+			"GO-2025-3547": {
+				{
+					Osv: "GO-2025-3547",
+					Trace: []Trace{
+						{
+							Module:   "k8s.io/kubernetes",
+							Version:  "v1.30.10",
+							Package:  "k8s.io/kubernetes/pkg/features",
+							Function: "init",
+							Position: Position{
+								Filename: "pkg/features/client_adapter.go",
+								Line:     17,
+								Column:   1,
+							},
+						},
+						{
+							Module:   "package",
+							Package:  "package",
+							Function: "init",
+							Position: Position{
+								Filename: "main.go",
+								Line:     46,
+								Column:   2,
+							},
+						},
+					},
+				},
+				{
+					Osv: "GO-2025-3547",
+					Trace: []Trace{
+						{
+							Module:   "k8s.io/kubernetes",
+							Version:  "v1.30.10",
+							Package:  "k8s.io/kubernetes/pkg/kubelet/cri/remote",
+							Function: "ContainerStatus",
+							Position: Position{
+								Filename: "pkg/kubelet/cri/remote/remote_runtime.go",
+								Line:     416,
+								Column:   32,
+							},
+						},
+						{
+							Module:   "package",
+							Package:  "package/pkg/cri",
+							Function: "GetContainersPerPID",
+							Position: Position{
+								Filename: "pkg/cri/containers.go",
+								Line:     39,
+								Column:   52,
+							},
+						},
+					},
+				},
 			},
 		}
-		// when
-		r.PruneIgnoreVulns(logger, ignoredVulns)
-		// then
-		require.Len(t, r.Statements, 1)
-		assert.Equal(t, "GO-2025-0002", r.Statements[0].Vulnerability.Name)
-	})
 
-	t.Run("need to revaluate vulnerability", func(t *testing.T) {
 		// given
-		r := newOpenVexReport()
-		ignoredVulns := []configuration.Vulnerability{
-			{
-				ID:      "GO-2025-0001",
-				Expires: time.Date(2020, 5, 10, 0, 0, 0, 0, time.UTC),
-				Info:    "https://pkg.go.dev/vuln/GO-2025-0001",
-			},
-		}
+		report, err := os.ReadFile("../testdata/valid_report.txt")
+		require.NoError(t, err)
 		// when
-		r.PruneIgnoreVulns(logger, ignoredVulns)
+		parsedReport, err := parseReport(report)
+		require.NoError(t, err)
 		// then
-		require.Len(t, r.Statements, 3)
-		assert.Equal(t, "GO-2025-0001", r.Statements[0].Vulnerability.Name)
-		assert.Equal(t, "GO-2025-0002", r.Statements[1].Vulnerability.Name)
-		assert.Equal(t, "GO-2025-0003", r.Statements[2].Vulnerability.Name)
+		assert.Len(t, parsedReport.Finding, 2)
+		assert.Equal(t, expectedFindings, parsedReport.Finding)
+		assert.Len(t, parsedReport.OSV, 3)
+		assert.Equal(t, expectedOSVs, parsedReport.OSV)
 	})
 
-}
+	t.Run("invalid report - error decoding JSON", func(t *testing.T) {
+		// given
+		report, err := os.ReadFile("../testdata/invalid_report_decoding.txt")
+		require.NoError(t, err)
+		// when
+		_, err = parseReport(report)
+		// then
+		require.EqualError(t, err, "error decoding JSON: invalid character '{' after object key:value pair")
+	})
 
-func newOpenVexReport() *govulncheck.OpenVexReport {
-	r := &govulncheck.OpenVexReport{}
-	r.Statements = []govulncheck.Statement{
-		{
-			Vulnerability: govulncheck.Vulnerability{
-				Name: "GO-2025-0001",
-			},
-			Status: govulncheck.Affected,
-		},
-		{
-			Vulnerability: govulncheck.Vulnerability{
-				Name: "GO-2025-0002",
-			},
-			Status: govulncheck.Affected,
-		},
-		{
-			Vulnerability: govulncheck.Vulnerability{
-				Name: "GO-2025-0003",
-			},
-			Status: govulncheck.Affected,
-		},
-		{
-			Vulnerability: govulncheck.Vulnerability{
-				Name: "GO-2025-0004",
-			},
-			Status: govulncheck.NotAffected,
-		},
-	}
-	return r
+	t.Run("invalid report - failed to unmarshal Finding struct", func(t *testing.T) {
+		// given
+		report, err := os.ReadFile("../testdata/invalid_report_unmarshal.txt")
+		require.NoError(t, err)
+		// when
+		_, err = parseReport(report)
+		// then
+		require.EqualError(t, err, "failed to unmarshal Finding struct: json: cannot unmarshal number into Go struct field Finding.osv of type string")
+	})
 }

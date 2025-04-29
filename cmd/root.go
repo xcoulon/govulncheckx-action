@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"encoding/json"
 	"fmt"
 	"log"
 	"os"
@@ -34,17 +33,13 @@ func NewVulnCheckCmd() *cobra.Command {
 			}
 			logger := log.Default()
 			logger.SetOutput(cmd.ErrOrStderr())
-			r, err := govulncheck.Scan(cmd.Context(), logger, config, path)
+			vulns, err := govulncheck.Scan(cmd.Context(), logger, config, path)
 			switch {
 			case err != nil:
 				return err
-			case len(r.Statements) > 0:
-				jr, err := json.MarshalIndent(r.Statements, "", "  ")
-				if err != nil {
-					return fmt.Errorf("failed to encode the vulnerability report: %w", err)
-				}
-				logger.Println(string(jr))
-				return fmt.Errorf("%d vulnerabilities found", len(r.Statements))
+			case len(vulns) > 0:
+				govulncheck.PrintVulnerabilities(logger, vulns)
+				return fmt.Errorf("%d vulnerabilities found", len(vulns))
 			default:
 				logger.Println("no vulnerabilities found")
 				return nil
