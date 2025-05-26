@@ -161,6 +161,6 @@ func TestParseReport(t *testing.T) {
 		// when
 		_, err = parseReport(report)
 		// then
-		require.EqualError(t, err, "failed to unmarshal Finding struct: json: cannot unmarshal number into Go struct field Finding.osv of type string")
+		require.EqualError(t, err, "failed to unmarshal Finding struct: json: cannot unmarshal number into Go struct field Trace.trace.version of type string")
 	})
 }
