@@ -132,7 +132,7 @@ func TestParseReport(t *testing.T) {
 		}
 
 		// given
-		report, err := os.ReadFile("../testdata/valid_report.txt")
+		report, err := os.ReadFile("../testdata/valid_report.json")
 		require.NoError(t, err)
 		// when
 		parsedReport, err := parseReport(report)
@@ -146,7 +146,7 @@ func TestParseReport(t *testing.T) {
 
 	t.Run("invalid report - error decoding JSON", func(t *testing.T) {
 		// given
-		report, err := os.ReadFile("../testdata/invalid_report_decoding.txt")
+		report, err := os.ReadFile("../testdata/invalid_report_decoding.json")
 		require.NoError(t, err)
 		// when
 		_, err = parseReport(report)
@@ -156,7 +156,7 @@ func TestParseReport(t *testing.T) {
 
 	t.Run("invalid report - failed to unmarshal Finding struct", func(t *testing.T) {
 		// given
-		report, err := os.ReadFile("../testdata/invalid_report_unmarshal.txt")
+		report, err := os.ReadFile("../testdata/invalid_report_unmarshal.json")
 		require.NoError(t, err)
 		// when
 		_, err = parseReport(report)
