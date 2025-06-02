@@ -54,21 +54,21 @@ func TestNewConfiguration(t *testing.T) {
     # Module: k8s.io/kubernetes
     # Fixed in: N/A
     - id: GO-2025-3547
-      expires: 2025-05-10
+      silence-until: 2025-05-10
       info: https://pkg.go.dev/vuln/GO-2025-3547
     # Kubernetes GitRepo Volume Inadvertent Local Repository Access in k8s.io/kubernetes
     # More info: https://pkg.go.dev/vuln/GO-2025-3521
     # Module: k8s.io/kubernetes
     # Fixed in: N/A
     - id: GO-2025-3521
-      expires: 2025-05-10
+      silence-until: 2025-05-10
       info: https://pkg.go.dev/vuln/GO-2025-3521
     # Request smuggling due to acceptance of invalid chunked data in net/http
     # More info: https://pkg.go.dev/vuln/GO-2025-3563
     # Standard library
     # Fixed in: net/http/internal@go1.23.8
     - id: GO-2025-3563
-      expires: 2025-05-10
+      silence-until: 2025-05-10
       info: https://pkg.go.dev/vuln/GO-2025-3563`
 		_, err = tempFile.WriteString(content)
 		require.NoError(t, err)
@@ -79,13 +79,13 @@ func TestNewConfiguration(t *testing.T) {
 		require.NoError(t, err)
 		require.Len(t, c.IgnoredVulnerabilities, 3)
 		assert.Equal(t, "GO-2025-3547", c.IgnoredVulnerabilities[0].ID)
-		assert.Equal(t, "2025-05-10", c.IgnoredVulnerabilities[0].Expires.Format("2006-01-02"))
+		assert.Equal(t, "2025-05-10", c.IgnoredVulnerabilities[0].SilenceUntil.Format("2006-01-02"))
 		assert.Equal(t, "https://pkg.go.dev/vuln/GO-2025-3547", c.IgnoredVulnerabilities[0].Info)
 		assert.Equal(t, "GO-2025-3521", c.IgnoredVulnerabilities[1].ID)
-		assert.Equal(t, "2025-05-10", c.IgnoredVulnerabilities[1].Expires.Format("2006-01-02"))
+		assert.Equal(t, "2025-05-10", c.IgnoredVulnerabilities[1].SilenceUntil.Format("2006-01-02"))
 		assert.Equal(t, "https://pkg.go.dev/vuln/GO-2025-3521", c.IgnoredVulnerabilities[1].Info)
 		assert.Equal(t, "GO-2025-3563", c.IgnoredVulnerabilities[2].ID)
-		assert.Equal(t, "2025-05-10", c.IgnoredVulnerabilities[2].Expires.Format("2006-01-02"))
+		assert.Equal(t, "2025-05-10", c.IgnoredVulnerabilities[2].SilenceUntil.Format("2006-01-02"))
 		assert.Equal(t, "https://pkg.go.dev/vuln/GO-2025-3563", c.IgnoredVulnerabilities[2].Info)
 	})
 

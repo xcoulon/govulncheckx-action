@@ -1,8 +1,7 @@
 = govulncheck-action
 
-A custom govulncheck action that ignores vulnerabilities listed in the `.govulncheck.yaml` file, with an expiration date to automatically stop ignoring them.
-Once expired, the vulnerability will reappear in the results, prompting you to reassess it.
-
+A custom govulncheck action that ignores vulnerabilities listed in the `.govulncheck.yaml` file. Each entry can include a `silence_until` field, which sets an expiration date for how long the vulnerability should be silenced.
+Once the `silence_until` date has passed, the vulnerability will reappear in the results, prompting you to reassess it.
 
 == `.govulncheck.yaml` file structure:
 
@@ -10,7 +9,7 @@ Once expired, the vulnerability will reappear in the results, prompting you to r
 ignored-vulnerabilities:
     # comment vulnerability information
     - id: <vulnerability-id>
-      expires: <expiration-date>
+      silence-until: <silence-until-date>
       info: <vulnerability-info-link>
 ```
 
@@ -22,14 +21,14 @@ ignored-vulnerabilities:
     # Module: k8s.io/kubernetes
     # Fixed in: N/A
     - id: GO-2025-3547
-      expires: 2020-05-10
+      silence-until: 2020-05-10
       info: https://pkg.go.dev/vuln/GO-2025-3547
 ```
 
 == Best practices
 - Before choosing to ignore a specific vulnerability, ensure that no fix or viable workaround is available.
 
-- The expiration date for ignoring a vulnerability should be set within a one-month time frame.
+- The `silence_until` field for ignoring a vulnerability should be set within a one-month time frame.
 
 
 == How to use it
