@@ -8,13 +8,13 @@ import (
 )
 
 type Configuration struct {
-	IgnoredVulnerabilities []Vulnerability `yaml:"ignored-vulnerabilities"`
+	IgnoredVulnerabilities []*Vulnerability `yaml:"ignored-vulnerabilities"`
 }
 
 type Vulnerability struct {
-	ID      string    `yaml:"id"`
-	Expires time.Time `yaml:"expires"`
-	Info    string    `yaml:"info"`
+	ID           string    `yaml:"id"`
+	SilenceUntil time.Time `yaml:"silence-until"`
+	Info         string    `yaml:"info"`
 }
 
 func New(path string) (Configuration, error) {
