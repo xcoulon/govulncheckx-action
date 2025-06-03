@@ -40,6 +40,5 @@ func Scan(ctx context.Context, logger *log.Logger, config configuration.Configur
 	}
 
 	// remove ignored vulnerabilities
-	PruneIgnoreVulns(logger, vulns, config.IgnoredVulnerabilities)
-	return vulns, nil
+	return pruneIgnoredVulns(logger, vulns, config.IgnoredVulnerabilities), nil
 }

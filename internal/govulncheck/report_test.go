@@ -146,20 +146,31 @@ func TestParseReport(t *testing.T) {
 
 	t.Run("invalid report - error decoding JSON", func(t *testing.T) {
 		// given
-		report, err := os.ReadFile("../testdata/invalid_report_decoding.json")
-		require.NoError(t, err)
+		report := []byte(`{`)
 		// when
-		_, err = parseReport(report)
+		_, err := parseReport(report)
 		// then
-		require.EqualError(t, err, "error decoding JSON: invalid character '{' after object key:value pair")
+		require.EqualError(t, err, "error decoding JSON: unexpected EOF")
 	})
 
 	t.Run("invalid report - failed to unmarshal Finding struct", func(t *testing.T) {
 		// given
-		report, err := os.ReadFile("../testdata/invalid_report_unmarshal.json")
-		require.NoError(t, err)
+		report := []byte(`
+{
+  "finding": {
+    "osv": "GO-2025-3563",
+    "fixed_version": "v1.23.8",
+    "trace": [
+      {
+        "module": "stdlib",
+        "version": 1
+      }
+    ]
+  }
+}
+`)
 		// when
-		_, err = parseReport(report)
+		_, err := parseReport(report)
 		// then
 		require.EqualError(t, err, "failed to unmarshal Finding struct: json: cannot unmarshal number into Go struct field Trace.trace.version of type string")
 	})
