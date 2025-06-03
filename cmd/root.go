@@ -33,7 +33,7 @@ func NewVulnCheckCmd() *cobra.Command {
 			}
 			logger := log.Default()
 			logger.SetOutput(cmd.ErrOrStderr())
-			vulns, err := govulncheck.Scan(cmd.Context(), logger, config, path)
+			vulns, err := govulncheck.Scan(cmd.Context(), logger, govulncheck.DefaultScan, config, path)
 			switch {
 			case err != nil:
 				return err
