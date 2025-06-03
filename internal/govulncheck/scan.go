@@ -29,7 +29,6 @@ func Scan(ctx context.Context, logger *log.Logger, scan ScanFunc, config configu
 type ScanFunc func(ctx context.Context, logger *log.Logger, path string) ([]byte, error)
 
 var DefaultScan ScanFunc = func(ctx context.Context, logger *log.Logger, path string) ([]byte, error) {
-	logger.Printf("scan -C %s -format json ./...\n", path)
 	// check that the path exists
 	fsEntries, err := os.ReadDir(path)
 	if err != nil {
