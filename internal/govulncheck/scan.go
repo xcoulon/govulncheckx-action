@@ -11,7 +11,24 @@ import (
 	"golang.org/x/vuln/scan"
 )
 
-func Scan(ctx context.Context, logger *log.Logger, config configuration.Configuration, path string) ([]*Vulnerability, error) {
+func Scan(ctx context.Context, logger *log.Logger, scan ScanFunc, config configuration.Configuration, path string) ([]*Vulnerability, error) {
+	rawReport, err := scan(ctx, logger, path)
+	if err != nil {
+		return nil, err
+	}
+	// get the vulns from the report
+	vulns, err := getVulnerabilities(rawReport)
+	if err != nil {
+		return nil, err
+	}
+
+	// remove ignored vulnerabilities
+	return pruneIgnoredVulns(logger, vulns, config.IgnoredVulnerabilities), nil
+}
+
+type ScanFunc func(ctx context.Context, logger *log.Logger, path string) ([]byte, error)
+
+var DefaultScan ScanFunc = func(ctx context.Context, logger *log.Logger, path string) ([]byte, error) {
 	logger.Printf("scan -C %s -format json ./...\n", path)
 	// check that the path exists
 	fsEntries, err := os.ReadDir(path)
@@ -21,7 +38,6 @@ func Scan(ctx context.Context, logger *log.Logger, config configuration.Configur
 	for _, e := range fsEntries {
 		logger.Println(e.Name())
 	}
-
 	c := scan.Command(ctx, "-C", path, "-format", "json", "./...")
 	out := &bytes.Buffer{}
 	c.Stdout = out
@@ -32,13 +48,5 @@ func Scan(ctx context.Context, logger *log.Logger, config configuration.Configur
 	if err := c.Wait(); err != nil {
 		return nil, fmt.Errorf("failed while running golang/govulncheck: %w", err)
 	}
-
-	// get the vulns
-	vulns, err := getVulnerabilities(out.Bytes())
-	if err != nil {
-		return nil, err
-	}
-
-	// remove ignored vulnerabilities
-	return pruneIgnoredVulns(logger, vulns, config.IgnoredVulnerabilities), nil
+	return out.Bytes(), nil
 }
