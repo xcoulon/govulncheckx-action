@@ -1,9 +1,9 @@
-= govulncheck-action
+# govulncheck-action
 
 A custom govulncheck action that ignores vulnerabilities listed in the `.govulncheck.yaml` file. Each entry can include a `silence_until` field, which sets an expiration date for how long the vulnerability should be silenced.
 Once the `silence_until` date has passed, the vulnerability will reappear in the results, prompting you to reassess it.
 
-== `.govulncheck.yaml` file structure:
+## the `.govulncheck.yaml` file structure:
 
 ```
 ignored-vulnerabilities:
@@ -25,13 +25,15 @@ ignored-vulnerabilities:
       info: https://pkg.go.dev/vuln/GO-2025-3547
 ```
 
-== Best practices
+## Best practices
+
 - Before choosing to ignore a specific vulnerability, ensure that no fix or viable workaround is available.
 
 - The `silence_until` field for ignoring a vulnerability should be set within a one-month time frame.
 
 
-== How to use it
+## How to use it
+
 ```
 name: govulncheck
 on:
